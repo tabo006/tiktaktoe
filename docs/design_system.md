@@ -1,6 +1,6 @@
 # Design System
 
-## Fonts and Colors
+## Fonts, Colors and Sizes
 
 ### Fonts
 The game uses the "Permanent Marker" font from Google Fonts for every text elements.
@@ -16,6 +16,14 @@ The game uses the "Permanent Marker" font from Google Fonts for every text eleme
 - **Player O Color**: `black`
 - **Winner Background**: `green`
 - **Non-winning Background**: `grey`
+
+### Sizes
+- **Header h1**: 40px
+- **Button**: 25px
+- **Winner Text**: 30px
+- **Turn indicator**: 25px
+- **X and O**: 50px
+
 
 ## Game Components
 
