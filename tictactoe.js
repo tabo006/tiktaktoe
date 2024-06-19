@@ -1,9 +1,14 @@
+//global varibales 
+//when turn = 3 the game is not started and nobody can play
 var turn=3;
 var count = 0;
 var gameState= 'inital';
 var hover= true;
 const clicked=[false, false, false, false, false, false, false, false, false];
+
+//funciton used to handle the player's moves
 function handleClick(event, button_text){
+    //game needs to be started before clicking
     if(turn == 3){
         alert("You must click on start game or restart game first")
     }else if (button_text != '' && hover == false){
@@ -32,6 +37,7 @@ function handleClick(event, button_text){
         }
     }
 }
+//funciton used for computer to rndomly play in any free box
 function computerPlay(){
     var empptySquares= [];
     const player = document.getElementById('turn');
@@ -56,6 +62,8 @@ function computerPlay(){
         player.textContent="X turn";
     }
 }
+
+//function used to scan game after each play and know if somebody has won
 function scanGame(player){
     const square1 = document.getElementById('1');
     const square2 = document.getElementById('2');
@@ -67,13 +75,14 @@ function scanGame(player){
     const square8 = document.getElementById('8');
     const square9 = document.getElementById('9');
     const winner = document.getElementById('winner');
+    //checking all possible ways to win for a winner
     if (square1.textContent == player && square2.textContent == player && square3.textContent == player ){
         winner.textContent=player + ' WON, Please restart game to continue';
         turn =3;
         gameState='done';
         setWinnerColors('1','2','3', player);
     } else if (square4.textContent == player && square5.textContent == player && square6.textContent == player ){
-        winner.textContent=player + ' WON, Please restart game to continue';
+        winner.textContent= player + ' WON, Please restart game to continue';
         turn =3;
         gameState='done';
         setWinnerColors('4','5','6');
@@ -114,6 +123,8 @@ function scanGame(player){
         setWinnerColors('0','0','0');
     }
 }
+
+//function used to change the colors of the squares to green to show the winning pattern
 function setWinnerColors(id1, id2, id3){
     if (id1 != "0"){
         const square1 = document.getElementById(id1);
@@ -131,6 +142,7 @@ function setWinnerColors(id1, id2, id3){
     });
 
 }
+//upon restarting the game each button is set back to empty and all Xs and Os erased
 function resetBoard() {
     const buttons = document.querySelectorAll('.game-square');
     buttons.forEach(button => {
@@ -140,6 +152,8 @@ function resetBoard() {
     });
 }
 
+//this sets the game state back to the initial and calls for the resetboard function
+//it also assigns randomly the first player of each game 
 function handleStart(event){
     turn = Math.floor(Math.random() * 2);
     count = 0;
@@ -158,6 +172,8 @@ function handleStart(event){
         computerPlay();
     }
 }
+
+//event listners for clicks and hovers on our buttons/squares
 document.addEventListener( 'DOMContentLoaded', (event) => {
 
     const buttons= document.querySelectorAll('.game-square');
@@ -168,10 +184,12 @@ document.addEventListener( 'DOMContentLoaded', (event) => {
             handleClick(event, buttonText);
         });
     });
-
+    
+    //hovering only works if the game is started first
     if (gameState != 'initial'){
         buttons.forEach(button => {
             
+            //can only hover on empty squares/buttons
             if (button.textContent == ''){
                 button.addEventListener('mouseover', (event) => {
                     // Change the button's background color
