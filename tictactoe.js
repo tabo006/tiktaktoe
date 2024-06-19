@@ -1,15 +1,18 @@
 var turn=3;
 var count = 0;
-var gameState= 'inital'
+var gameState= 'inital';
+var hover= true;
+const clicked=[false, false, false, false, false, false, false, false, false];
 function handleClick(event, button_text){
     if(turn == 3){
         alert("You must click on start game or restart game first")
-    } else  if (button_text != ''){
+    }else if (button_text != '' && hover == false){
         alert("can only play on an empty box")
     }else{
         const button = document.getElementById(event.target.id);
         const player = document.getElementById('turn');
-        if (turn == 0){
+        var tmp = parseInt(event.target.id)
+        if (turn == 0 && clicked[tmp-1] == false ){
             button.style.color= 'red';
             button.textContent = 'X';
             turn ++;
@@ -25,7 +28,7 @@ function handleClick(event, button_text){
                 
             
             
-        }else if (turn == 1){
+        }else if (turn == 1 && clicked[tmp-1] == false ){
             button.textContent = 'O';
             turn --;
             count++;
@@ -128,15 +131,18 @@ function handleStart(event){
     turn = Math.floor(Math.random() * 2);
     count = 0;
     resetBoard();
-    gameState='startGame'
+    gameState='startGame';
     const button = document.getElementById('turn');
     const winner = document.getElementById('winner');
-    winner.textContent='Game in process'
+    winner.textContent='Game in process';
     if (turn == 0){
-        button.textContent="X TURN"
+        button.textContent="X TURN";
     }else if (turn ==1){
-        button.textContent="O TURN"
+        button.textContent="O TURN";
     }
+    for (let i = 0; i < clicked.length; i++) {
+        clicked[i]=false;
+      }
 }
 document.addEventListener( 'DOMContentLoaded', (event) => {
 
@@ -146,8 +152,43 @@ document.addEventListener( 'DOMContentLoaded', (event) => {
         button.addEventListener('click', (event) => {
             const buttonText = button.textContent;
             handleClick(event, buttonText);
+            var tmp = parseInt(event.target.id)
+            clicked[tmp-1]=true;
         });
     });
+
+    if (gameState != 'initial'){
+        buttons.forEach(button => {
+            
+            if (button.textContent == ''){
+                button.addEventListener('mouseover', (event) => {
+                    // Change the button's background color
+                    var tmp = parseInt(event.target.id)
+                    if(clicked[tmp-1] == false && gameState == 'startGame'){
+                        hover=true;
+                        if (turn == 0){
+                            button.style.color='red'
+                            button.textContent='X';
+                        }else{
+                            button.textContent='O';
+                        }
+                    }
+
+                  });
+                   
+                button.addEventListener('mouseout', (event) => {
+                    hover = false;
+                    var tmp = parseInt(event.target.id)
+                    if (clicked[tmp-1] == false){
+                        button.textContent='';
+                        button.style.color = '';
+                    }
+                  });
+                
+            }
+        });
+    }
+
     
     start_btn.addEventListener('click', (event) => {
         handleStart(event)
