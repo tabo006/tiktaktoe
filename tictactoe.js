@@ -155,15 +155,15 @@ function resetBoard() {
 //this sets the game state back to the initial and calls for the resetboard function
 //it also assigns randomly the first player of each game 
 function handleStart(event){
-    turn = Math.floor(Math.random() * 2);
-    count = 0;
-    resetBoard();
+    const button = document.getElementById('turn');
+    const winner = document.getElementById('winner');
     for (let i = 0; i < clicked.length; i++) {
         clicked[i]=false;
       }
+    count = 0;
+    resetBoard();
     gameState='startGame';
-    const button = document.getElementById('turn');
-    const winner = document.getElementById('winner');
+    turn = Math.floor(Math.random() * 2);
     winner.textContent='Game in process';
     if (turn == 0){
         button.textContent="X TURN";
