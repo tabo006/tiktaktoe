@@ -4,10 +4,39 @@
         <meta charset="UTF-8" />
         <title>Tik Tak Toe game</title>
         <link rel="stylesheet" href="tiktaktoe.css" />
+        <script src="tiktaktoe.js"></script>
     </head>
     <body>
         <header>
             <h1>Welcome to our Tik Tak Toe game</h1>
+            <button class="start-game" style="height: 20pt;"> Start / Restart game</button>
         </header>
+        <section style="padding: 20px">
+            <table>
+                <thead>
+                    <tr>
+                        <th colspan= 3 style="text-align: center;" ><p id="turn"></p></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr >
+                        <td><button id='1' class="game-square" style="font-size: 50pt;"></button></td>
+                        <td><button id='2' class="game-square" style="font-size: 50pt;"></button></td>
+                        <td><button id='3' class="game-square" style="font-size: 50pt;"></button></td>
+                    </tr>
+                    <tr>
+                        <td><button id='4' class="game-square" style="font-size: 50pt;"></button></td>
+                        <td><button  id='5' class="game-square" style="font-size: 50pt;"></button></td>
+                        <td><button id='6' class="game-square" style="font-size: 50pt;"></button></td>
+                    </tr>
+                    <tr>
+                        <td><button id='7' class="game-square" style="font-size: 50pt;"></button></td>
+                        <td><button id='8' class="game-square" style="font-size: 50pt;"></button></td>
+                        <td><button id='9' class="game-square" style="font-size: 50pt;"></button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
     </body>
+    
 </html>
