@@ -17,6 +17,8 @@ function handleClick(event, button_text){
             button.textContent = 'X';
             turn ++;
             count++;
+            var tmp = parseInt(event.target.id)
+            clicked[tmp-1]=true;
             if (count > 4){
                 scanGame('X');
             }
@@ -24,23 +26,34 @@ function handleClick(event, button_text){
                 player.textContent="Game is done";
             }else{
                 player.textContent="O turn";
+                computerPlay();
             }
-                
-            
-            
-        }else if (turn == 1 && clicked[tmp-1] == false ){
-            button.textContent = 'O';
-            turn --;
-            count++;
-            if (count > 4){
-                scanGame('O');
-            }
-            if (gameState == 'done'){
-                player.textContent="Game is done";
-            }else{
-                player.textContent="X turn";
-            }
+                 
         }
+    }
+}
+function computerPlay(){
+    var empptySquares= [];
+    const player = document.getElementById('turn');
+    for (let i=0; i < 9; i++){
+        if(clicked[i]==false){
+            empptySquares.push(i+1);
+        }
+    }
+    const randomIndex = Math.floor(Math.random() * empptySquares.length);
+    id = empptySquares[randomIndex];
+    clicked[id-1]=true;
+    const square = document.getElementById(id);
+    square.textContent= "O";
+    turn --;
+    count++;
+    if (count > 4){
+        scanGame('O');
+    }
+    if (gameState == 'done'){
+        player.textContent="Game is done";
+    }else{
+        player.textContent="X turn";
     }
 }
 function scanGame(player){
@@ -131,6 +144,9 @@ function handleStart(event){
     turn = Math.floor(Math.random() * 2);
     count = 0;
     resetBoard();
+    for (let i = 0; i < clicked.length; i++) {
+        clicked[i]=false;
+      }
     gameState='startGame';
     const button = document.getElementById('turn');
     const winner = document.getElementById('winner');
@@ -139,10 +155,8 @@ function handleStart(event){
         button.textContent="X TURN";
     }else if (turn ==1){
         button.textContent="O TURN";
+        computerPlay();
     }
-    for (let i = 0; i < clicked.length; i++) {
-        clicked[i]=false;
-      }
 }
 document.addEventListener( 'DOMContentLoaded', (event) => {
 
@@ -152,8 +166,6 @@ document.addEventListener( 'DOMContentLoaded', (event) => {
         button.addEventListener('click', (event) => {
             const buttonText = button.textContent;
             handleClick(event, buttonText);
-            var tmp = parseInt(event.target.id)
-            clicked[tmp-1]=true;
         });
     });
 
@@ -166,12 +178,8 @@ document.addEventListener( 'DOMContentLoaded', (event) => {
                     var tmp = parseInt(event.target.id)
                     if(clicked[tmp-1] == false && gameState == 'startGame'){
                         hover=true;
-                        if (turn == 0){
-                            button.style.color='red'
-                            button.textContent='X';
-                        }else{
-                            button.textContent='O';
-                        }
+                        button.style.color='red'
+                        button.textContent='X';
                     }
 
                   });
