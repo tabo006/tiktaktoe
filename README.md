@@ -28,7 +28,7 @@ Currently, there are no automated tests for this project.
 
 ## Contributors
 
-The students of group 51 in the CSI3140 class
+The students of group 51 in the CSI3140 class: Abraham Tabo, 300228201 and Chloé Al-Frenn, 300211508
 
 ## Documentation
 The documentation is available in the [Design System](/docs/design_system.md) file. 
