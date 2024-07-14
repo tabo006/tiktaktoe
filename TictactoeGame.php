@@ -113,6 +113,7 @@ class TicTacToeGame{
 
     public function checkDraw(){
         if ($this -> getMoves() == 9 && $this-> checkWin('X') == false && $this-> checkWin('O') == false){
+            $this->currentState = 'Draw';
             return true;
         }else{
             return false;
