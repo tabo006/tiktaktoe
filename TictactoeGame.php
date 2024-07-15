@@ -15,12 +15,7 @@ class TicTacToeGame{
         $this->board = ['', '', '','','','','','',''];
         $this-> currentState = 'Playing';
         $this-> movesCount=0;
-        $randomInt = random_int(0, 1);
-        if ($randomInt == 0){
-            $this -> currentPlayer='X';
-        }else{
-            $this -> currentPlayer='O';
-        }
+        $this -> currentPlayer='X';
     }
 
     public function getBoard()
@@ -69,7 +64,7 @@ class TicTacToeGame{
 
         for ($i = 0; $i < 9; $i++) {
             if ($this->board[$i] == false) {
-                $emptySquares[] = $i + 1;
+                $emptySquares[] = $i;
             }
         }
     // Get a random index from the empty squares array

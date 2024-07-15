@@ -5,6 +5,7 @@ require_once 'Leaderboard.php';
 function printScores($leaderboard) {
     echo "Current Scores:<br>";
     echo "Player X: " . $leaderboard->getScoreX() . "<br>";
+    echo "Draw: " . $leaderboard->getScoreDraw() . "<br>";
     echo "Player O: " . $leaderboard->getScoreO() . "<br><br>";
 }
 

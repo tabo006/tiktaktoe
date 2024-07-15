@@ -14,29 +14,13 @@ function sendRequest($url, $data, $session_cookie_file) {
 
     return json_decode($response, true);
 }
-function printSessionSettings($session_cookie_file) {
-    echo "Session Settings:<br>";
-    echo "session.save_path: " . ini_get('session.save_path') . "<br>";
-    echo "session.use_cookies: " . ini_get('session.use_cookies') . "<br>";
-    echo "session.cookie_secure: " . ini_get('session.cookie_secure') . "<br>";
-    echo "session.use_only_cookies: " . ini_get('session.use_only_cookies') . "<br>";
-    echo "session.cookie_lifetime: " . ini_get('session.cookie_lifetime') . "<br>";
 
-    // Check the session ID from the cookie file
-    if (file_exists($session_cookie_file)) {
-        $cookies = file_get_contents($session_cookie_file);
-        echo "Cookies: <pre>" . htmlspecialchars($cookies) . "</pre><br>";
-        if (preg_match('/PHPSESSID\s+(\S+)/', $cookies, $matches)) {
-            echo "Session ID: " . $matches[1] . "<br>";
-        } else {
-            echo "Session ID not found in cookie file.<br>";
-        }
-    } else {
-        echo "Session cookie file not found.<br>";
-    }
-    echo "<br>";
-}
 function printBoard($board) {
+    if ($board === NULL) {
+        echo "Board is NULL.<br>";
+        return;
+    }
+    
     echo "Current Board:<br>";
     for ($i = 0; $i < 9; $i++) {
         echo ($board[$i] === '' ? '-' : $board[$i]) . ' ';
@@ -46,138 +30,69 @@ function printBoard($board) {
     }
     echo "<br>";
 }
+
+// Use a file to store session cookies
 $session_cookie_file = tempnam(sys_get_temp_dir(), 'session');
 
+// Function to reset the game and print the board
+function resetGame($session_cookie_file) {
+    $response = sendRequest('http://localhost:8000/api.php', ['action' => 'reset'], $session_cookie_file);
+    echo "Reset Game:<br>";
+    print_r($response);
+    printBoard($response['board']);
+    echo "<br>";
+}
 
-// Test resetting the game
+// Function to play a move and print the response and board
+function playMove($index, $session_cookie_file) {
+    $response = sendRequest('http://localhost:8000/api.php', ['action' => 'play', 'index' => $index], $session_cookie_file);
+    echo "Player Move at Index $index:<br>";
+    print_r($response);
+    printBoard($response['board']);
+    if ($response['response']['status'] == 'win') {
+        echo "Player " . $response['response']['player'] . " wins!<br>";
+    } elseif ($response['response']['status'] == 'draw') {
+        echo "The game is a draw.<br>";
+    } elseif ($response['response']['status'] == 'invalid') {
+        echo "Invalid move at index $index.<br>";
+    } elseif (isset($response['response']['comp_Index'])) {
+        echo "Computer played at Index " . $response['response']['comp_Index'] . "<br>";
+    }
+    echo "<br>";
+}
+
+// Test resetting the game and playing moves
+resetGame($session_cookie_file);
+
+// X wins
+$moves_x_win = [0, 3, 1, 4, 2];
+foreach ($moves_x_win as $index) {
+    playMove($index, $session_cookie_file);
+}
+
+// Reset for next game
+resetGame($session_cookie_file);
+
+// X wins again
+$moves_x_win_again = [0, 3, 1, 4, 2];
+foreach ($moves_x_win_again as $index) {
+    playMove($index, $session_cookie_file);
+}
+
+// Reset for next game
+resetGame($session_cookie_file);
+
+// O wins
+$moves_o_win = [0, 3, 1, 4, 7, 5];
+foreach ($moves_o_win as $index) {
+    playMove($index, $session_cookie_file);
+}
+
+// Attempt to play at an index that has already been played
+playMove(5, $session_cookie_file);
+
+// Print final leaderboard
 $response = sendRequest('http://localhost:8000/api.php', ['action' => 'reset'], $session_cookie_file);
-echo "Reset Game:<br>";
-print_r($response);
-printBoard($response['board']);
-echo "<br>";
-// Print session settings after the request
-printSessionSettings($session_cookie_file);
-
-
-// Test making a move
-$response = sendRequest('http://localhost:8000/api.php', ['action' => 'play', 'index' => 0], $session_cookie_file);
-echo "Player Move at Index 0:<br>";
-print_r($response);
-printBoard($response['board']);
-echo "<br>";
-
-// Test making an invalid move
-$response = sendRequest('http://localhost:8000/api.php', ['action' => 'play', 'index' => 0], $session_cookie_file);
-echo "Player Move at Index 0:<br>";
-print_r($response);
-printBoard($response['board']);
-echo "<br>";
-
-// Test making another move
-$response = sendRequest('http://localhost:8000/api.php', ['action' => 'play', 'index' => 1], $session_cookie_file);
-echo "Player Move at Index 1:<br>";
-print_r($response);
-printBoard($response['board']);
-echo "<br>";
-
-// Continue playing until win or draw
-$response = sendRequest('http://localhost:8000/api.php', ['action' => 'play', 'index' => 4], $session_cookie_file);
-echo "Player Move at Index 4:<br>";
-print_r($response);
-printBoard($response['board']);
-echo "<br>";
-
-//invalid move 2
-$response = sendRequest('http://localhost:8000/api.php', ['action' => 'play', 'index' => 4], $session_cookie_file);
-echo "Player Move at Index 4:<br>";
-print_r($response);
-printBoard($response['board']);
-echo "<br>";
-
-
-$response = sendRequest('http://localhost:8000/api.php', ['action' => 'play', 'index' => 7], $session_cookie_file);
-echo "Player Move at Index 7:<br>";
-print_r($response);
-printBoard($response['board']);
-echo "<br>";
-
-//win situation
-$response = sendRequest('http://localhost:8000/api.php', ['action' => 'play', 'index' => 8], $session_cookie_file);
-echo "Player Move at Index 8:<br>";
-print_r($response);
-printBoard($response['board']);
-echo "<br>";
-
-//check if allowed to play after win
-$response = sendRequest('http://localhost:8000/api.php', ['action' => 'play', 'index' => 3], $session_cookie_file);
-echo "Player Move at Index 3:<br>";
-print_r($response);
-printBoard($response['board']);
-echo "<br>";
-
-// Test draw situation
-$response = sendRequest('http://localhost:8000/api.php', ['action' => 'reset'], $session_cookie_file);
-echo "Reset Game:<br>";
-print_r($response);
-printBoard($response['board']);
-echo "<br>";
-
-$response = sendRequest('http://localhost:8000/api.php', ['action' => 'play', 'index' => 0], $session_cookie_file);
-echo "Player Move at Index 0:<br>";
-print_r($response);
-printBoard($response['board']);
-echo "<br>";
-$response = sendRequest('http://localhost:8000/api.php', ['action' => 'play', 'index' => 1], $session_cookie_file);
-echo "Player Move at Index 1:<br>";
-print_r($response);
-printBoard($response['board']);
-echo "<br>";
-$response = sendRequest('http://localhost:8000/api.php', ['action' => 'play', 'index' => 2], $session_cookie_file);
-echo "Player Move at Index 2:<br>";
-print_r($response);
-printBoard($response['board']);
-echo "<br>";
-$response = sendRequest('http://localhost:8000/api.php', ['action' => 'play', 'index' => 4], $session_cookie_file);
-echo "Player Move at Index 4:<br>";
-print_r($response);
-printBoard($response['board']);
-echo "<br>";
-$response = sendRequest('http://localhost:8000/api.php', ['action' => 'play', 'index' => 3], $session_cookie_file);
-echo "Player Move at Index 3:<br>";
-print_r($response);
-printBoard($response['board']);
-echo "<br>";
-$response = sendRequest('http://localhost:8000/api.php', ['action' => 'play', 'index' => 5], $session_cookie_file);
-echo "Player Move at Index 5:<br>";
-print_r($response);
-printBoard($response['board']);
-echo "<br>";
-$response = sendRequest('http://localhost:8000/api.php', ['action' => 'play', 'index' => 7], $session_cookie_file);
-echo "Player Move at Index 7:<br>";
-print_r($response);
-printBoard($response['board']);
-echo "<br>";
-$response = sendRequest('http://localhost:8000/api.php', ['action' => 'play', 'index' => 6], $session_cookie_file);
-echo "Player Move at Index 6:<br>";
-print_r($response);
-printBoard($response['board']);
-echo "<br>";
-$response = sendRequest('http://localhost:8000/api.php', ['action' => 'play', 'index' => 6], $session_cookie_file);
-echo "Player Move at Index 6:<br>";
-print_r($response);
-printBoard($response['board']);
-echo "<br>";
-$response = sendRequest('http://localhost:8000/api.php', ['action' => 'play', 'index' => 8], $session_cookie_file);
-echo "Player Move at Index 8:<br>";
-print_r($response);
-printBoard($response['board']);
-echo "<br>";
-
-$response = sendRequest('http://localhost:8000/api.php', ['action' => 'play', 'index' => 8], $session_cookie_file);
-echo "Player Move at Index 8:<br>";
-print_r($response);
-printBoard($response['board']);
-echo "<br>";
-// Print session settings after the request
-printSessionSettings($session_cookie_file);
+echo "Final Leaderboard:<br>";
+print_r($response['leaderboard']);
 ?>
