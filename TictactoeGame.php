@@ -10,6 +10,7 @@ class TicTacToeGame{
     public function __construct()
     {
         $this->resetGame();
+        $this-> currentState = 'Initial';
     }
 
     public function resetGame(){
