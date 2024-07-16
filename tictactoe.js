@@ -79,6 +79,7 @@ function resetBoard() {
  */
 function handleClick(event, button_text){
     //game needs to be started before clicking
+    const winner = document.getElementById('winner');
     if(turn == 3){
         alert("You must click on start game or restart game first")
     }else if (button_text != '' && hover == false){
@@ -105,17 +106,27 @@ function handleClick(event, button_text){
                     let gameState = response.response.status; 
                     let comp_index = response.response.comp_Index;
                     let gamePlayer = response.response.player;
+                    let winIndex = response.response.Win_Index_ID;
                     console.log('player', gamePlayer)
+                    console.log('winindex', winIndex);
 
-                    if(gamePlayer === 'O'){
-                        computerPlay(comp_index, gameState);
-                        scanGame('O');
+                    if(gameState == 'win' && gamePlayer === 'O'){
+                        computerPlay(comp_index, gameState); //to draw the last move made by the computer
+                        setWinnerColors(winIndex[0], winIndex[1], winIndex[2]);
+                        player.textContent="Game is done";
+                        winner.textContent= 'O WON, Please restart game to continue';
                     }
-                    if ((gameState == 'win' && gamePlayer === 'X') || gameState == 'draw' ){
-                        scanGame('X');
-                        player.textContent="Game is done x";
+                    if (gameState == 'win' && gamePlayer === 'X'){
+                        setWinnerColors(winIndex[0], winIndex[1], winIndex[2]);
+                        player.textContent="Game is done";
+                        winner.textContent= 'X WON, Please restart game to continue';
+                    } else 
+                    if(gameState == 'draw'){
+                        player.textContent="Game is done";
+                        winner.textContent= 'it is a draw, Please restart game to continue';
+                        setWinnerColors('0','0','0');
                     }
-                    else{
+                    else {
                         player.textContent="O turn";
                         computerPlay(comp_index, gameState);
                     }
@@ -138,8 +149,6 @@ function handleClick(event, button_text){
 function computerPlay(index, gameState) {
     const player = document.getElementById('turn');
     
-    //index is passed as a parameter from server
-    
     // Update clicked array based on received index
     clicked[index] = true;
     
@@ -150,75 +159,18 @@ function computerPlay(index, gameState) {
     
     //gameState is passed as a parameter from server
     if (gameState == 'win' || gameState == 'draw' ){
-        scanGame('O');
         player.textContent="Game is done";
     } else {
         player.textContent = "X turn";
     }
 }
 
-//function used to scan game after each play and know if somebody has won
-function scanGame(player){
-    const square1 = document.getElementById('1');
-    const square2 = document.getElementById('2');
-    const square3 = document.getElementById('3');
-    const square4 = document.getElementById('4');
-    const square5 = document.getElementById('5');
-    const square6 = document.getElementById('6');
-    const square7 = document.getElementById('7');
-    const square8 = document.getElementById('8');
-    const square9 = document.getElementById('9');
-    const winner = document.getElementById('winner');
-    //checking all possible ways to win for a winner
-    if (square1.textContent == player && square2.textContent == player && square3.textContent == player ){
-        winner.textContent=player + ' WON, Please restart game to continue';
-        turn =3;
-        gameState='done';
-        setWinnerColors('1','2','3', player);
-    } else if (square4.textContent == player && square5.textContent == player && square6.textContent == player ){
-        winner.textContent= player + ' WON, Please restart game to continue';
-        turn =3;
-        gameState='done';
-        setWinnerColors('4','5','6');
-    } else if (square7.textContent == player && square8.textContent == player && square9.textContent == player ){
-        winner.textContent=player + ' WON, Please restart game to continue';
-        turn =3;
-        gameState='done';
-        setWinnerColors('7','8','9');
-    } else if (square1.textContent == player && square4.textContent == player && square7.textContent == player ){
-        winner.textContent=player + ' WON, Please restart game to continue';
-        turn =3;
-        gameState='done';
-        setWinnerColors('1','4','7');
-    } else if (square2.textContent == player && square5.textContent == player && square8.textContent == player ){
-        winner.textContent=player + ' WON, Please restart game to continue';
-        turn =3;
-        gameState='done';
-        setWinnerColors('2','5','8');
-    }else if (square3.textContent == player && square6.textContent == player && square9.textContent == player ){
-        winner.textContent=player + ' WON, Please restart game to continue';
-        turn =3;
-        gameState='done';
-        setWinnerColors('3','6','9');
-    }else if (square1.textContent == player && square5.textContent == player && square9.textContent == player ){
-        winner.textContent=player + ' WON, Please restart game to continue';
-        turn =3;
-        gameState='done';
-        setWinnerColors('1','5','9');
-    }else if (square3.textContent == player && square5.textContent == player && square7.textContent == player ){
-        winner.textContent=player + ' WON, Please restart game to continue';
-        turn =3;
-        gameState='done';
-        setWinnerColors('3','5','7');
-    }else if(count == 9){
-        winner.textContent=' No winner, please restart';
-        turn =3;
-        gameState='done';
-        setWinnerColors('0','0','0');
-    }
-}
+/**
+ * function used to change the colors of the squares to green to show the winning pattern
+ * it takes the three id squares and makes them green. if it is 0 0 0 then the 
+ * whole background becomes grey
+ */
 
-//function used to change the colors of the squares to green to show the winning pattern
 function setWinnerColors(id1, id2, id3){
     if (id1 != "0"){
         const square1 = document.getElementById(id1);
