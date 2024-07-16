@@ -1,9 +1,7 @@
 //global varibales 
 var turn=3;
-var count = 0;
-var hover= true;
-const clicked=[false, false, false, false, false, false, false, false, false];
 var gameDone = false;
+
 
 /**
  * This function will update the score in the leaderboard 
@@ -35,10 +33,6 @@ function handleStart(event){
     const turnButton = document.getElementById('turn');
     const winner = document.getElementById('winner');
     gameDone = false;
-    for (let i = 0; i < clicked.length; i++) {
-        clicked[i]=false;
-      }
-    {
         $.ajax({
             type: 'POST',
             url: 'api.php',
@@ -58,7 +52,7 @@ function handleStart(event){
                 console.log('Error server could not reset the game', error);
             }
         })
-    }
+    
 }
 
 /** 
@@ -84,7 +78,7 @@ function handleClick(event, button_text){
     const winner = document.getElementById('winner');
     if(turn == 3){
         alert("You must click on start game or restart game first")
-    }else if (button_text != '' && hover == false){
+    }else if (button_text != ''){
         alert("can only play on an empty box")
     }else{
         const button = document.getElementById(event.target.id);
@@ -144,8 +138,7 @@ function handleClick(event, button_text){
                     console.log('Error server could not handle the click', error);
                 }
             })
-                 
-        
+                  
     }
 }
 
@@ -155,12 +148,8 @@ function handleClick(event, button_text){
  * 
  */
 function computerPlay(index, gameState) {
-    const player = document.getElementById('turn');
-    
     const square = document.getElementById(index+1);
     square.textContent = "O";
-    turn--;
-    count++;
     
     //gameState is passed as a parameter from server
     if (gameState == 'win' || gameState == 'draw' ){
@@ -195,7 +184,7 @@ function setWinnerColors(id1, id2, id3){
 }
 
 
-//event listners for clicks and hovers on our buttons/squares
+//event listners for clicks on our buttons/squares
 document.addEventListener( 'DOMContentLoaded', (event) => {
 
     const buttons= document.querySelectorAll('.game-square');
@@ -207,35 +196,6 @@ document.addEventListener( 'DOMContentLoaded', (event) => {
         });
     });
     
-    //hovering only works if the game is started first
-    if (turn != 3){
-        buttons.forEach(button => {
-            
-            //can only hover on empty squares/buttons
-            if (button.textContent == ''){
-                button.addEventListener('mouseover', (event) => {
-                    // Change the button's background color
-                    var tmp = parseInt(event.target.id)
-                    if(clicked[tmp-1] == false){
-                        hover=true;
-                        button.style.color='red'
-                        button.textContent='X';
-                    }
-
-                  });
-                   
-                button.addEventListener('mouseout', (event) => {
-                    hover = false;
-                    var tmp = parseInt(event.target.id)
-                    if (clicked[tmp-1] == false){
-                        button.textContent='';
-                        button.style.color = '';
-                    }
-                  });
-                
-            }
-        });
-    }
 
     
     start_btn.addEventListener('click', (event) => {
