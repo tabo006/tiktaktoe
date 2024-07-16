@@ -3,6 +3,7 @@ var turn=3;
 var count = 0;
 var hover= true;
 const clicked=[false, false, false, false, false, false, false, false, false];
+var gameDone = false;
 
 /**
  * This function will update the score in the leaderboard 
@@ -33,6 +34,7 @@ function updateLeaderboard() {
 function handleStart(event){
     const turnButton = document.getElementById('turn');
     const winner = document.getElementById('winner');
+    gameDone = false;
     for (let i = 0; i < clicked.length; i++) {
         clicked[i]=false;
       }
@@ -88,8 +90,6 @@ function handleClick(event, button_text){
         const button = document.getElementById(event.target.id);
         const player = document.getElementById('turn');
         var tmp = parseInt(event.target.id)
-        //check that players turn and the square is empty
-        if (turn == 0 && clicked[tmp-1] == false ){
             //send to server and update the ui
             $.ajax({
                 type: 'POST',
@@ -97,11 +97,6 @@ function handleClick(event, button_text){
                 data: ({action: 'play', index: tmp-1}),
                 success: function(response){
                     console.log('X Playing',  response);
-                    //Styling the board
-                    button.style.color= 'red';
-                    button.textContent = 'X';
-                    turn ++;
-                    clicked[tmp-1]=true;
                     //get the response (status, and comp_index)
                     let gameState = response.response.status; 
                     let comp_index = response.response.comp_Index;
@@ -109,35 +104,48 @@ function handleClick(event, button_text){
                     let winIndex = response.response.Win_Index_ID;
                     console.log('player', gamePlayer)
                     console.log('winindex', winIndex);
-
-                    if(gameState == 'win' && gamePlayer === 'O'){
-                        computerPlay(comp_index, gameState); //to draw the last move made by the computer
-                        setWinnerColors(winIndex[0], winIndex[1], winIndex[2]);
-                        player.textContent="Game is done";
-                        winner.textContent= 'O WON, Please restart game to continue';
+                    if(gameState == 'invalid' ){   //check that the square is empty before drawing
+                        console.log('invalid move');
+                        alert("You must click on an empty tile pick an other one")
+                    } else if(gameDone){
+                        //cannot draw on the board until the game is reset
+                    }else {
+                        //styling the board
+                        button.style.color= 'red';
+                        button.textContent = 'X';
+                        if(gameState == 'win' && gamePlayer === 'O'){
+                            computerPlay(comp_index, gameState); //to draw the last move made by the computer
+                            setWinnerColors(winIndex[0], winIndex[1], winIndex[2]);
+                            player.textContent="Game is done";
+                            winner.textContent= 'O WON, Please restart game to continue';
+                            gameDone = true;
+                        } else 
+                        if (gameState == 'win' && gamePlayer === 'X'){
+                            setWinnerColors(winIndex[0], winIndex[1], winIndex[2]);
+                            player.textContent="Game is done";
+                            winner.textContent= 'X WON, Please restart game to continue';
+                            gameDone = true;
+                        } else 
+                        if(gameState == 'draw'){
+                            player.textContent="Game is done";
+                            winner.textContent= 'it is a draw, Please restart game to continue';
+                            setWinnerColors('0','0','0');
+                            gameDone = true;
+                        }
+                        else {
+                            player.textContent="O turn";
+                            computerPlay(comp_index, gameState);
+                        }
                     }
-                    if (gameState == 'win' && gamePlayer === 'X'){
-                        setWinnerColors(winIndex[0], winIndex[1], winIndex[2]);
-                        player.textContent="Game is done";
-                        winner.textContent= 'X WON, Please restart game to continue';
-                    } else 
-                    if(gameState == 'draw'){
-                        player.textContent="Game is done";
-                        winner.textContent= 'it is a draw, Please restart game to continue';
-                        setWinnerColors('0','0','0');
-                    }
-                    else {
-                        player.textContent="O turn";
-                        computerPlay(comp_index, gameState);
-                    }
+                    
                     
                 },
                 error: function(xhr, status, error){
-                    console.log('Error server could not reset the game', error);
+                    console.log('Error server could not handle the click', error);
                 }
             })
                  
-        }
+        
     }
 }
 
@@ -148,9 +156,6 @@ function handleClick(event, button_text){
  */
 function computerPlay(index, gameState) {
     const player = document.getElementById('turn');
-    
-    // Update clicked array based on received index
-    clicked[index] = true;
     
     const square = document.getElementById(index+1);
     square.textContent = "O";
@@ -188,15 +193,6 @@ function setWinnerColors(id1, id2, id3){
     });
 
 }
-
-
-
-
-
-
-
-
-
 
 
 //event listners for clicks and hovers on our buttons/squares
