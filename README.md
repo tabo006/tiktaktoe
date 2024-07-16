@@ -19,7 +19,10 @@ The motivation behind this project is to create a single-player game as a learni
 1. Clone this git repository.
 2. Make sure you have php installed on your system.
 3. Navigate to the repository and Open a terminal in the repository.
-4. Run the command php -S localhost:8000
+4. Run the command 
+```bash 
+php -S localhost:8000
+```
 5. Open http://localhost:8000/tictactoe.html in your web browser and you should be all set to play the game.
 
 ## PHP Files
@@ -66,7 +69,11 @@ This test file instantiates the `TicTacToeGame` class and tests its methods, inc
 
 ### Running Tests
 
-To run the tests, you can use the command line to execute the test files individually using PHP. For example:
+To run the tests, you can use the command line to execute the test files individually using PHP after running 
+```bash 
+php -S localhost:8000
+``` 
+For example:
 
 ```bash
 php TestApi.php
