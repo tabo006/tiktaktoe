@@ -161,7 +161,7 @@ function handleStart(event){
         clicked[i]=false;
       }
     count = 0;
-    resetBoard();
+    resetBoardOnServer();
     gameState='startGame';
     turn = Math.floor(Math.random() * 2);
     winner.textContent='Game in process';
@@ -220,3 +220,19 @@ document.addEventListener( 'DOMContentLoaded', (event) => {
         handleStart(event)
     })
 });
+
+//ajax calls to api.php
+function resetBoardOnServer(){
+    $.ajax({
+        type: 'POST',
+        url: 'api.php',
+        data: ({action: 'reset'}),
+        success: function(response){
+            console.log('Server reset the game',  response);
+            resetBoard();
+        },
+        error: function(xhr, status, error){
+            console.log('Error server could not reset the game', error);
+        }
+    })
+}
