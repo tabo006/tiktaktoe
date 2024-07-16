@@ -4,7 +4,26 @@ var count = 0;
 var hover= true;
 const clicked=[false, false, false, false, false, false, false, false, false];
 
-
+/**
+ * This function will update the score in the leaderboard 
+ * fetching the vaue from the server.
+ */
+function updateLeaderboard() {
+    $.ajax({
+        type: 'POST',
+        url: 'api.php',
+        data: ({ action: 'get_leaderboard' }),
+        success: function(response) {
+            if (response.leaderboard) {
+                document.getElementById('score-x').textContent = response.leaderboard.X;
+                document.getElementById('score-o').textContent = response.leaderboard.O;
+            }
+        },
+        error: function(xhr, status, error) {
+            console.log('Error fetching leaderboard', error);
+        }
+    });
+}
 
 /**
  * This function handles when the start/restart game Button is clicked
@@ -31,7 +50,7 @@ function handleStart(event){
                     turnButton.textContent="X TURN"; //The server sets the first current player to X always so it should only be X TURN
                     winner.textContent = "";
                 } 
-                
+                updateLeaderboard();
             },
             error: function(xhr, status, error){
                 console.log('Error server could not reset the game', error);
