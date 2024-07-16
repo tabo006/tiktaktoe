@@ -1,12 +1,63 @@
 //global varibales 
-//when turn = 3 the game is not started and nobody can play
 var turn=3;
 var count = 0;
-var gameState= 'inital';
 var hover= true;
 const clicked=[false, false, false, false, false, false, false, false, false];
 
-//funciton used to handle the player's moves
+
+
+/**
+ * This function handles when the start/restart game Button is clicked
+ * It resets the board and checks who's turn it is
+ * 
+ */
+function handleStart(event){
+    const turnButton = document.getElementById('turn');
+    const winner = document.getElementById('winner');
+    for (let i = 0; i < clicked.length; i++) {
+        clicked[i]=false;
+      }
+    {
+        $.ajax({
+            type: 'POST',
+            url: 'api.php',
+            data: ({action: 'reset'}),
+            success: function(response){
+                console.log('Server resetting the game',  response);
+                resetBoard(); //resets the UI
+                turn = 0; //0 is x's turn
+                let currentPlayer = response.currentPlayer;
+                if(currentPlayer ===  'X'){
+                    turnButton.textContent="X TURN"; //The server sets the first current player to X always so it should only be X TURN
+                    winner.textContent = "";
+                } 
+                
+            },
+            error: function(xhr, status, error){
+                console.log('Error server could not reset the game', error);
+            }
+        })
+    }
+}
+
+/** 
+ * This functions resets the UI to an empty board
+ * 
+ */
+function resetBoard() {
+    const buttons = document.querySelectorAll('.game-square');
+    buttons.forEach(button => {
+        button.textContent = '';
+        button.style.backgroundColor = '';
+        button.style.color= '';
+    });
+}
+
+/**
+ * This function is used to handle the Click of the player
+ * on the board
+ * 
+ */
 function handleClick(event, button_text){
     //game needs to be started before clicking
     if(turn == 3){
@@ -17,49 +68,73 @@ function handleClick(event, button_text){
         const button = document.getElementById(event.target.id);
         const player = document.getElementById('turn');
         var tmp = parseInt(event.target.id)
+        //check that players turn and the square is empty
         if (turn == 0 && clicked[tmp-1] == false ){
-            button.style.color= 'red';
-            button.textContent = 'X';
-            turn ++;
-            count++;
-            var tmp = parseInt(event.target.id)
-            clicked[tmp-1]=true;
-            if (count > 4){
-                scanGame('X');
-            }
-            if (gameState == 'done'){
-                player.textContent="Game is done";
-            }else{
-                player.textContent="O turn";
-                computerPlay();
-            }
+            //send to server and update the ui
+            $.ajax({
+                type: 'POST',
+                url: 'api.php',
+                data: ({action: 'play', index: tmp-1}),
+                success: function(response){
+                    console.log('X Playing',  response);
+                    //Styling the board
+                    button.style.color= 'red';
+                    button.textContent = 'X';
+                    turn ++;
+                    clicked[tmp-1]=true;
+                    //get the response (status, and comp_index)
+                    let gameState = response.response.status; 
+                    let comp_index = response.response.comp_Index;
+                    let gamePlayer = response.response.player;
+                    console.log('player', gamePlayer)
+
+                    if(gamePlayer === 'O'){
+                        computerPlay(comp_index, gameState);
+                        scanGame('O');
+                    }
+                    if ((gameState == 'win' && gamePlayer === 'X') || gameState == 'draw' ){
+                        scanGame('X');
+                        player.textContent="Game is done x";
+                    }
+                    else{
+                        player.textContent="O turn";
+                        computerPlay(comp_index, gameState);
+                    }
+                    
+                },
+                error: function(xhr, status, error){
+                    console.log('Error server could not reset the game', error);
+                }
+            })
                  
         }
     }
 }
-//funciton used for computer to rndomly play in any free box
-function computerPlay(){
-    var empptySquares= [];
+
+
+/**
+ * When the computer plays
+ * 
+ */
+function computerPlay(index, gameState) {
     const player = document.getElementById('turn');
-    for (let i=0; i < 9; i++){
-        if(clicked[i]==false){
-            empptySquares.push(i+1);
-        }
-    }
-    const randomIndex = Math.floor(Math.random() * empptySquares.length);
-    id = empptySquares[randomIndex];
-    clicked[id-1]=true;
-    const square = document.getElementById(id);
-    square.textContent= "O";
-    turn --;
+    
+    //index is passed as a parameter from server
+    
+    // Update clicked array based on received index
+    clicked[index] = true;
+    
+    const square = document.getElementById(index+1);
+    square.textContent = "O";
+    turn--;
     count++;
-    if (count > 4){
+    
+    //gameState is passed as a parameter from server
+    if (gameState == 'win' || gameState == 'draw' ){
         scanGame('O');
-    }
-    if (gameState == 'done'){
         player.textContent="Game is done";
-    }else{
-        player.textContent="X turn";
+    } else {
+        player.textContent = "X turn";
     }
 }
 
@@ -142,36 +217,16 @@ function setWinnerColors(id1, id2, id3){
     });
 
 }
-//upon restarting the game each button is set back to empty and all Xs and Os erased
-function resetBoard() {
-    const buttons = document.querySelectorAll('.game-square');
-    buttons.forEach(button => {
-        button.textContent = '';
-        button.style.backgroundColor = '';
-        button.style.color= '';
-    });
-}
 
-//this sets the game state back to the initial and calls for the resetboard function
-//it also assigns randomly the first player of each game 
-function handleStart(event){
-    const button = document.getElementById('turn');
-    const winner = document.getElementById('winner');
-    for (let i = 0; i < clicked.length; i++) {
-        clicked[i]=false;
-      }
-    count = 0;
-    resetBoardOnServer();
-    gameState='startGame';
-    turn = Math.floor(Math.random() * 2);
-    winner.textContent='Game in process';
-    if (turn == 0){
-        button.textContent="X TURN";
-    }else if (turn ==1){
-        button.textContent="O TURN";
-        computerPlay();
-    }
-}
+
+
+
+
+
+
+
+
+
 
 //event listners for clicks and hovers on our buttons/squares
 document.addEventListener( 'DOMContentLoaded', (event) => {
@@ -186,7 +241,7 @@ document.addEventListener( 'DOMContentLoaded', (event) => {
     });
     
     //hovering only works if the game is started first
-    if (gameState != 'initial'){
+    if (turn != 3){
         buttons.forEach(button => {
             
             //can only hover on empty squares/buttons
@@ -194,7 +249,7 @@ document.addEventListener( 'DOMContentLoaded', (event) => {
                 button.addEventListener('mouseover', (event) => {
                     // Change the button's background color
                     var tmp = parseInt(event.target.id)
-                    if(clicked[tmp-1] == false && gameState == 'startGame'){
+                    if(clicked[tmp-1] == false){
                         hover=true;
                         button.style.color='red'
                         button.textContent='X';
@@ -221,18 +276,4 @@ document.addEventListener( 'DOMContentLoaded', (event) => {
     })
 });
 
-//ajax calls to api.php
-function resetBoardOnServer(){
-    $.ajax({
-        type: 'POST',
-        url: 'api.php',
-        data: ({action: 'reset'}),
-        success: function(response){
-            console.log('Server reset the game',  response);
-            resetBoard();
-        },
-        error: function(xhr, status, error){
-            console.log('Error server could not reset the game', error);
-        }
-    })
-}
+
