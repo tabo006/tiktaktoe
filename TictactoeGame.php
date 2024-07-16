@@ -5,6 +5,7 @@ class TicTacToeGame{
     private $currentPlayer;
     private $currentState;
     private $movesCount;
+    private $winIndecies;
 
     public function __construct()
     {
@@ -16,6 +17,7 @@ class TicTacToeGame{
         $this-> currentState = 'Playing';
         $this-> movesCount=0;
         $this -> currentPlayer='X';
+        $this -> winIndecies= [0,0,0];
     }
 
     public function getBoard()
@@ -79,27 +81,35 @@ class TicTacToeGame{
     public function checkWin($player){
         if ($this-> board[0] == $player && $this-> board[1] == $player && $this-> board[2] == $player ){
             $this->currentState=$player;
+            $this->winIndecies= [1,2,3];
             return true;
         } else if ($this-> board[3] == $player && $this-> board[4] == $player && $this-> board[5] == $player ){
             $this->currentState=$player;
+            $this->winIndecies= [4,5,6];
             return true;
         } else if ($this-> board[6] == $player && $this-> board[7] == $player && $this-> board[8] == $player ){
             $this->currentState=$player;
+            $this->winIndecies= [7,8,9];
             return true;
         } else if ($this-> board[0] == $player && $this-> board[3] == $player && $this-> board[6] == $player ){
             $this->currentState=$player;
+            $this->winIndecies= [1,4,7];
             return true;
         } else if ($this-> board[1] == $player && $this-> board[4] == $player && $this-> board[7] == $player ){
             $this->currentState=$player;
+            $this->winIndecies= [2,5,8];
             return true;
         }else if ($this-> board[2] == $player && $this-> board[5] == $player && $this-> board[8] == $player ){
             $this->currentState=$player;
+            $this->winIndecies= [3,6,9];
             return true;
         }else if ($this-> board[0] == $player && $this-> board[4] == $player && $this-> board[8] == $player ){
             $this->currentState=$player;
+            $this->winIndecies= [1,5,9];
             return true;
         }else if ($this-> board[2] == $player && $this-> board[4] == $player && $this-> board[6] == $player ){
             $this->currentState=$player;
+            $this->winIndecies= [3,5,7];
             return true;
         }else{
             return false;
@@ -113,6 +123,10 @@ class TicTacToeGame{
         }else{
             return false;
         }
+    }
+    
+    public function getWinIndex(){
+        return $this->winIndecies;
     }
 
     public function PrintBoard() {

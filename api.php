@@ -28,7 +28,7 @@ switch ($action) {
         if ($game->getState() == 'Playing') {
             if ($game->play($index)) {
                 if ($game->checkWin('X')) {
-                    $response = ['status' => 'win', 'player' => 'X'];
+                    $response = ['status' => 'win', 'player' => 'X', 'Win_Index_ID' => $game->getWinIndex()];
                     $leaderboard->incScore('X');
                 } elseif ($game->checkDraw()) {
                     $response = ['status' => 'draw'];
@@ -39,7 +39,7 @@ switch ($action) {
                     $compIndex = $game->getComputerMoveIndex();
                     if ($game->play($compIndex)) {
                         if ($game->checkWin('O')) {
-                            $response = ['status' => 'win', 'player' => 'O', 'comp_Index' => $compIndex];
+                            $response = ['status' => 'win', 'player' => 'O', 'comp_Index' => $compIndex, 'Win_Index_ID' => $game->getWinIndex()];
                             $leaderboard->incScore('O');
                         } elseif ($game->checkDraw()) {
                             $response = ['status' => 'draw', 'comp_Index' => $compIndex];
@@ -56,9 +56,9 @@ switch ($action) {
             }
         } else {
             if ($game->checkWin('X')) {
-                $response = ['status' => 'win', 'player' => 'X'];
+                $response = ['status' => 'win', 'player' => 'X', 'Win_Index_ID' => $game->getWinIndex()];
             } elseif ($game->checkWin('O')) {
-                $response = ['status' => 'win', 'player' => 'O'];
+                $response = ['status' => 'win', 'player' => 'O', 'Win_Index_ID' => $game->getWinIndex()];
             } elseif ($game->checkDraw()) {
                 $response = ['status' => 'draw'];
             }
