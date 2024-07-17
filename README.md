@@ -35,6 +35,7 @@ This file handles the AJAX requests from the JavaScript frontend. It initializes
 
 - `reset`: Resets the game.
 - `play`: Processes a move by the player and, if applicable, the computer.
+- `set_initial`: Sets the state of the game as Initial, making the game unplayable until it is started.
 
 ### Leaderboard.php
 
@@ -47,11 +48,12 @@ This file contains the `Leaderboard` class, which tracks the scores of players X
 
 This file contains the `TicTacToeGame` class, which manages the game board, the current player, and the game status. 
 
-- `resetGame()`: Resets the game to the initial state.
+- `resetGame()`: Resets the game to the playing state.
 - `play($index)`: Processes a player's move.
 - `checkWin($player)`: Checks if the specified player has won.
 - `checkDraw()`: Checks if the game is a draw.
 - `getComputerMoveIndex()`: Determines the computer's move.
+- `setInitialState()`: Resets the game to the initial state.
 
 ## Tests
 
