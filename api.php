@@ -25,6 +25,7 @@ switch ($action) {
     //used to play (X always plays first)
     case 'set_initial':
         $game->setInitialState();
+        $leaderboard->resetScore();
         $response = ['status' => $game->getState()];
         break;
     case 'play':

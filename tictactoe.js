@@ -103,12 +103,14 @@ function handleClick(event, button_text) {
           setWinnerColors(winIndex[0], winIndex[1], winIndex[2]);
           player.textContent = "Game is done";
           winner.textContent = "O WON, Please restart game to continue";
+          updateLeaderboard();
           gameDone = true;
         } else if (gameState == "win" && gamePlayer === "X") {
           setWinnerColors(winIndex[0], winIndex[1], winIndex[2]);
           player.textContent = "Game is done";
           winner.textContent = "X WON, Please restart game to continue";
           gameDone = true;
+          updateLeaderboard();
         } else if (gameState == "draw") {
           player.textContent = "Game is done";
           winner.textContent = "it is a draw, Please restart game to continue";
