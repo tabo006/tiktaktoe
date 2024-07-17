@@ -21,6 +21,14 @@ class TicTacToeGame{
         $this -> winIndecies= [0,0,0];
     }
 
+    public function setInitialState() {
+        $this->board = ['', '', '','','','','','',''];
+        $this-> currentState = 'Initial';
+        $this-> movesCount=0;
+        $this -> currentPlayer='X';
+        $this -> winIndecies= [0,0,0];
+    }
+
     public function getBoard()
     {
         return $this->board;

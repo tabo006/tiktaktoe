@@ -1,5 +1,4 @@
 //global varibales
-var started = false;
 var gameDone = false;
 
 /**
@@ -38,7 +37,6 @@ function handleStart(event) {
     success: function (response) {
       console.log("Server resetting the game", response);
       resetBoard(); //resets the UI
-      started = true; 
       let currentPlayer = response.currentPlayer;
       if (currentPlayer === "X") {
         turnButton.textContent = "X TURN"; //The server sets the first current player to X always so it should only be X TURN
@@ -69,68 +67,63 @@ function resetBoard() {
  * on the board
  */
 function handleClick(event, button_text) {
-  //game needs to be started before clicking
   const winner = document.getElementById("winner");
-  if (!started) {
-    alert("You must click on start game or restart game first");
-  } else if (button_text != "") {
-    alert("can only play on an empty box");
-  } else {
-    const button = document.getElementById(event.target.id);
-    const player = document.getElementById("turn");
-    var tmp = parseInt(event.target.id);
-    //send to server and update the ui
-    $.ajax({
-      type: "POST",
-      url: "api.php",
-      data: { action: "play", index: tmp - 1 },
-      success: function (response) {
-        console.log("X Playing", response);
-        //get the response (status, and comp_index)
-        let gameState = response.response.status;
+
+  const button = document.getElementById(event.target.id);
+  const player = document.getElementById("turn");
+  var tmp = parseInt(event.target.id);
+  //send to server and update the ui
+  $.ajax({
+    type: "POST",
+    url: "api.php",
+    data: { action: "play", index: tmp - 1 },
+    success: function (response) {
+      console.log("X Playing", response);
+      //get the response (status, and comp_index)
+      let gameState = response.response.status;
+
+      //game needs to be started before clicking
+      if (gameState == "Initial") {
+        alert("You must click on start game or restart game first");
+      } else if (gameState == "invalid") {
+        //check that the square is empty before drawing
+        console.log("invalid move");
+        alert("You must click on an empty tile pick an other one");
+      } else if (gameDone) {
+        //cannot draw on the board until the game is reset
+      } else {
+        //styling the board
         let comp_index = response.response.comp_Index;
         let gamePlayer = response.response.player;
         let winIndex = response.response.Win_Index_ID;
-        console.log("player", gamePlayer);
-        console.log("winindex", winIndex);
-        if (gameState == "invalid") {
-          //check that the square is empty before drawing
-          console.log("invalid move");
-          alert("You must click on an empty tile pick an other one");
-        } else if (gameDone) {
-          //cannot draw on the board until the game is reset
+        button.style.color = "red";
+        button.textContent = "X";
+        if (gameState == "win" && gamePlayer === "O") {
+          computerPlay(comp_index, gameState); //to draw the last move made by the computer
+          setWinnerColors(winIndex[0], winIndex[1], winIndex[2]);
+          player.textContent = "Game is done";
+          winner.textContent = "O WON, Please restart game to continue";
+          gameDone = true;
+        } else if (gameState == "win" && gamePlayer === "X") {
+          setWinnerColors(winIndex[0], winIndex[1], winIndex[2]);
+          player.textContent = "Game is done";
+          winner.textContent = "X WON, Please restart game to continue";
+          gameDone = true;
+        } else if (gameState == "draw") {
+          player.textContent = "Game is done";
+          winner.textContent = "it is a draw, Please restart game to continue";
+          setWinnerColors("0", "0", "0");
+          gameDone = true;
         } else {
-          //styling the board
-          button.style.color = "red";
-          button.textContent = "X";
-          if (gameState == "win" && gamePlayer === "O") {
-            computerPlay(comp_index, gameState); //to draw the last move made by the computer
-            setWinnerColors(winIndex[0], winIndex[1], winIndex[2]);
-            player.textContent = "Game is done";
-            winner.textContent = "O WON, Please restart game to continue";
-            gameDone = true;
-          } else if (gameState == "win" && gamePlayer === "X") {
-            setWinnerColors(winIndex[0], winIndex[1], winIndex[2]);
-            player.textContent = "Game is done";
-            winner.textContent = "X WON, Please restart game to continue";
-            gameDone = true;
-          } else if (gameState == "draw") {
-            player.textContent = "Game is done";
-            winner.textContent =
-              "it is a draw, Please restart game to continue";
-            setWinnerColors("0", "0", "0");
-            gameDone = true;
-          } else {
-            player.textContent = "O turn";
-            computerPlay(comp_index, gameState);
-          }
+          player.textContent = "O turn";
+          computerPlay(comp_index, gameState);
         }
-      },
-      error: function (xhr, status, error) {
-        console.log("Error server could not handle the click", error);
-      },
-    });
-  }
+      }
+    },
+    error: function (xhr, status, error) {
+      console.log("Error server could not handle the click", error);
+    },
+  });
 }
 
 /**
@@ -175,6 +168,29 @@ function setWinnerColors(id1, id2, id3) {
 
 //event listners for clicks on our buttons/squares
 document.addEventListener("DOMContentLoaded", (event) => {
+  function performInitialAction() {
+    $.ajax({
+      type: "POST",
+      url: "api.php",
+      data: { action: "set_initial" },
+      success: function (response) {
+        console.log("Game state set to Initial", response);
+        // Update the UI based on the initial state
+        if (response.response.status === "Initial") {
+          document.getElementById("turn").textContent =
+            "Press 'Start' to begin";
+          resetBoard();
+        }
+      },
+      error: function (xhr, status, error) {
+        console.log("Error setting game state to Initial", error);
+      },
+    });
+  }
+
+  // Call the initial action function when the DOM content is loaded
+  performInitialAction();
+
   const buttons = document.querySelectorAll(".game-square");
   const start_btn = document.querySelector(".start-game");
   buttons.forEach((button) => {

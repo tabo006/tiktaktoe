@@ -23,8 +23,17 @@ switch ($action) {
         $response = ['status' => $game->getState()];
         break;
     //used to play (X always plays first)
+    case 'set_initial':
+        $game->setInitialState();
+        $response = ['status' => $game->getState()];
+        break;
     case 'play':
         $index = $_POST['index'];
+          // Check if game state is "Initial"
+        if ($game->getState() == 'Initial') {
+            $response = ['status' => 'Initial'];
+            break;
+        } 
         if ($game->getState() == 'Playing') {
             if ($game->play($index)) {
                 if ($game->checkWin('X')) {
@@ -64,6 +73,7 @@ switch ($action) {
             }
         }
         break;
+       
 
     default:
         $response = ['status' => 'invalid_action'];
