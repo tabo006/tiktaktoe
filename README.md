@@ -71,7 +71,7 @@ This test file instantiates the `TicTacToeGame` class and tests its methods, inc
 
 ### Running Tests
 
-To run the tests, you can use the command line to execute the test files individually using PHP after running 
+To run the tests, you can use the command line to execute the test files individually using PHP after running. Tests are located in (/tests) folder
 ```bash 
 php -S localhost:8000
 ``` 

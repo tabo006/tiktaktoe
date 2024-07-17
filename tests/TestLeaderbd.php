@@ -1,5 +1,5 @@
 <?php
-require_once 'Leaderboard.php';
+require_once '../Leaderboard.php';
 
 // Function to print the current scores
 function printScores($leaderboard) {
