@@ -25,7 +25,6 @@ php -S localhost:8000
 ```
 5. Open http://localhost:8000/tictactoe.html in your web browser and you should be all set to play the game.
 
-## PHP Files
 
 ## PHP Files
 
@@ -78,9 +77,9 @@ php -S localhost:8000
 For example:
 
 ```bash
-php TestApi.php
-php TestLeaderbd.php
-php TicTacToeGame_test.php
+php tests/TestApi.php
+php tests/TestLeaderbd.php
+php tests/TicTacToeGame_test.php
 ```
 
 ## Contributors
