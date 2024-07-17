@@ -140,6 +140,7 @@ function handleClick(event, button_text) {
 function computerPlay(index, gameState) {
   const square = document.getElementById(index + 1);
   square.textContent = "O";
+  const player = document.getElementById("turn");
 
   //gameState is passed as a parameter from server
   if (gameState == "win" || gameState == "draw") {
