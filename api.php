@@ -23,12 +23,22 @@ switch ($action) {
         $response = ['status' => $game->getState()];
         break;
     //used to play (X always plays first)
+    case 'set_initial':
+        $game->setInitialState();
+        $leaderboard->resetScore();
+        $response = ['status' => $game->getState()];
+        break;
     case 'play':
         $index = $_POST['index'];
+          // Check if game state is "Initial"
+        if ($game->getState() == 'Initial') {
+            $response = ['status' => 'Initial'];
+            break;
+        } 
         if ($game->getState() == 'Playing') {
             if ($game->play($index)) {
                 if ($game->checkWin('X')) {
-                    $response = ['status' => 'win', 'player' => 'X'];
+                    $response = ['status' => 'win', 'player' => 'X', 'Win_Index_ID' => $game->getWinIndex()];
                     $leaderboard->incScore('X');
                 } elseif ($game->checkDraw()) {
                     $response = ['status' => 'draw'];
@@ -39,7 +49,7 @@ switch ($action) {
                     $compIndex = $game->getComputerMoveIndex();
                     if ($game->play($compIndex)) {
                         if ($game->checkWin('O')) {
-                            $response = ['status' => 'win', 'player' => 'O', 'comp_Index' => $compIndex];
+                            $response = ['status' => 'win', 'player' => 'O', 'comp_Index' => $compIndex, 'Win_Index_ID' => $game->getWinIndex()];
                             $leaderboard->incScore('O');
                         } elseif ($game->checkDraw()) {
                             $response = ['status' => 'draw', 'comp_Index' => $compIndex];
@@ -56,14 +66,15 @@ switch ($action) {
             }
         } else {
             if ($game->checkWin('X')) {
-                $response = ['status' => 'win', 'player' => 'X'];
+                $response = ['status' => 'win', 'player' => 'X', 'Win_Index_ID' => $game->getWinIndex()];
             } elseif ($game->checkWin('O')) {
-                $response = ['status' => 'win', 'player' => 'O'];
+                $response = ['status' => 'win', 'player' => 'O', 'Win_Index_ID' => $game->getWinIndex()];
             } elseif ($game->checkDraw()) {
                 $response = ['status' => 'draw'];
             }
         }
         break;
+       
 
     default:
         $response = ['status' => 'invalid_action'];

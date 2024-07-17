@@ -1,5 +1,5 @@
 <?php
-require_once 'TicTacToeGame.php';
+require_once '../TicTacToeGame.php';
 
 function testTicTacToeGame() {
     // Create a new game instance
