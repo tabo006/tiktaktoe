@@ -1,5 +1,5 @@
 //global varibales
-var turn = 3;
+var started = false;
 var gameDone = false;
 
 /**
@@ -38,7 +38,7 @@ function handleStart(event) {
     success: function (response) {
       console.log("Server resetting the game", response);
       resetBoard(); //resets the UI
-      turn = 0; //0 is x's turn
+      started = true; 
       let currentPlayer = response.currentPlayer;
       if (currentPlayer === "X") {
         turnButton.textContent = "X TURN"; //The server sets the first current player to X always so it should only be X TURN
@@ -71,7 +71,7 @@ function resetBoard() {
 function handleClick(event, button_text) {
   //game needs to be started before clicking
   const winner = document.getElementById("winner");
-  if (turn == 3) {
+  if (!started) {
     alert("You must click on start game or restart game first");
   } else if (button_text != "") {
     alert("can only play on an empty box");
